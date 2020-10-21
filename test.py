@@ -20,7 +20,22 @@ class TestLoadAndCenterDataset(unittest.TestCase):
 			self.assertAlmostEqual(np.sum(x[:, i]), 0)
 
 class TestGetCovariance(unittest.TestCase):
-	pass
+	def test_shape(self):
+		x = load_and_center_dataset('mnist.npy')
+		S = get_covariance(x)
+
+		# S should be square and have side length d
+		self.assertEqual(np.shape(S), (784, 784))
+
+	def test_values(self):
+		x = load_and_center_dataset('mnist.npy')
+		S = get_covariance(x)
+
+		# S should be symmetric
+		self.assertTrue(np.all(np.isclose(S, S.T)))
+
+		# S should have non-negative values on the diagonal
+		self.assertTrue(np.min(np.diagonal(S)) >= 0)
 
 class TestGetEig(unittest.TestCase):
 	pass
