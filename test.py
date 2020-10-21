@@ -1,6 +1,12 @@
+__author__ = 'cs540-testers'
+__credits__ = ['Harrison Clark', 'Stephen Jasina', 'Saurabh Kulkarni',
+		'Alex Moon']
+version = 'v1.0'
+
 import unittest
 import numpy as np
-from pca import load_and_center_dataset, get_covariance, get_eig, get_eig_perc, project_image, display_image
+from pca import load_and_center_dataset, get_covariance, get_eig, \
+		get_eig_perc, project_image, display_image
 
 class TestLoadAndCenterDataset(unittest.TestCase):
 	def test_load(self):
@@ -44,7 +50,8 @@ class TestGetEig(unittest.TestCase):
 		Lambda, U = get_eig(S, 2)
 
 		self.assertEqual(np.shape(Lambda), (2, 2))
-		self.assertTrue(np.all(np.isclose(Lambda, [[350880.76329673, 0], [0, 245632.27295307]])))
+		self.assertTrue(np.all(np.isclose(
+				Lambda, [[350880.76329673, 0], [0, 245632.27295307]])))
 
 		# The eigenvectors should be the columns
 		self.assertEqual(np.shape(U), (784, 2))
@@ -57,9 +64,11 @@ class TestGetEig(unittest.TestCase):
 
 		self.assertEqual(np.shape(Lambda), (784, 784))
 		# Check that Lambda is diagonal
-		self.assertEqual(np.count_nonzero(Lambda - np.diag(np.diagonal(Lambda))), 0)
+		self.assertEqual(np.count_nonzero(
+				Lambda - np.diag(np.diagonal(Lambda))), 0)
 		# Check that Lambda is sorted in decreasing order
-		self.assertTrue(np.all(np.equal(np.diagonal(Lambda), sorted(np.diagonal(Lambda), reverse=True))))
+		self.assertTrue(np.all(np.equal(np.diagonal(Lambda),
+				sorted(np.diagonal(Lambda), reverse=True))))
 
 		# The eigenvectors should be the columns
 		self.assertEqual(np.shape(U), (784, 784))
@@ -72,7 +81,8 @@ class TestGetEigPerc(unittest.TestCase):
 		Lambda, U = get_eig_perc(S, .07)
 
 		self.assertEqual(np.shape(Lambda), (2, 2))
-		self.assertTrue(np.all(np.isclose(Lambda, [[350880.76329673, 0], [0, 245632.27295307]])))
+		self.assertTrue(np.all(np.isclose(
+				Lambda, [[350880.76329673, 0], [0, 245632.27295307]])))
 
 		# The eigenvectors should be the columns
 		self.assertEqual(np.shape(U), (784, 2))
@@ -86,9 +96,11 @@ class TestGetEigPerc(unittest.TestCase):
 
 		self.assertEqual(np.shape(Lambda), (784, 784))
 		# Check that Lambda is diagonal
-		self.assertEqual(np.count_nonzero(Lambda - np.diag(np.diagonal(Lambda))), 0)
+		self.assertEqual(np.count_nonzero(
+				Lambda - np.diag(np.diagonal(Lambda))), 0)
 		# Check that Lambda is sorted in decreasing order
-		self.assertTrue(np.all(np.equal(np.diagonal(Lambda), sorted(np.diagonal(Lambda), reverse=True))))
+		self.assertTrue(np.all(np.equal(np.diagonal(Lambda),
+				sorted(np.diagonal(Lambda), reverse=True))))
 
 		# The eigenvectors should be the columns
 		self.assertEqual(np.shape(U), (784, 784))
@@ -99,11 +111,13 @@ class TestProjectImage(unittest.TestCase):
 		x = load_and_center_dataset('mnist.npy')
 		S = get_covariance(x)
 		_, U = get_eig(S, 2)
-		projected = project_image(x[3], U) # This is the image of the "9" in the spec
+		# This is the image of the "9" in the spec
+		projected = project_image(x[3], U)
 
 		self.assertEqual(np.shape(projected), (784, 1))
 		self.assertAlmostEqual(np.min(projected), -113.79455198736488)
 		self.assertAlmostEqual(np.max(projected), 120.0658469887994)
 
 if __name__ == '__main__':
+	print('Homework 5 Tester Version', version)
 	unittest.main()
