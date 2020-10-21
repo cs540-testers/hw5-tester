@@ -38,10 +38,61 @@ class TestGetCovariance(unittest.TestCase):
 		self.assertTrue(np.min(np.diagonal(S)) >= 0)
 
 class TestGetEig(unittest.TestCase):
-	pass
+	def test_small(self):
+		x = load_and_center_dataset('mnist.npy')
+		S = get_covariance(x)
+		Lambda, U = get_eig(S, 2)
+
+		self.assertEqual(np.shape(Lambda), (2, 2))
+		self.assertTrue(np.all(np.isclose(Lambda, [[350880.76329673, 0], [0, 245632.27295307]])))
+
+		# The eigenvectors should be the columns
+		self.assertEqual(np.shape(U), (784, 2))
+		self.assertTrue(np.all(np.isclose(S @ U, U @ Lambda)))
+
+	def test_large(self):
+		x = load_and_center_dataset('mnist.npy')
+		S = get_covariance(x)
+		Lambda, U = get_eig(S, 784)
+
+		self.assertEqual(np.shape(Lambda), (784, 784))
+		# Check that Lambda is diagonal
+		self.assertEqual(np.count_nonzero(Lambda - np.diag(np.diagonal(Lambda))), 0)
+		# Check that Lambda is sorted in decreasing order
+		self.assertTrue(np.all(np.equal(np.diagonal(Lambda), sorted(np.diagonal(Lambda), reverse=True))))
+
+		# The eigenvectors should be the columns
+		self.assertEqual(np.shape(U), (784, 784))
+		self.assertTrue(np.all(np.isclose(S @ U, U @ Lambda)))
 
 class TestGetEigPerc(unittest.TestCase):
-	pass
+	def test_small(self):
+		x = load_and_center_dataset('mnist.npy')
+		S = get_covariance(x)
+		Lambda, U = get_eig_perc(S, .07)
+
+		self.assertEqual(np.shape(Lambda), (2, 2))
+		self.assertTrue(np.all(np.isclose(Lambda, [[350880.76329673, 0], [0, 245632.27295307]])))
+
+		# The eigenvectors should be the columns
+		self.assertEqual(np.shape(U), (784, 2))
+		self.assertTrue(np.all(np.isclose(S @ U, U @ Lambda)))
+
+	def test_large(self):
+		x = load_and_center_dataset('mnist.npy')
+		S = get_covariance(x)
+		# This will select all eigenvalues/eigenvectors
+		Lambda, U = get_eig_perc(S, -1)
+
+		self.assertEqual(np.shape(Lambda), (784, 784))
+		# Check that Lambda is diagonal
+		self.assertEqual(np.count_nonzero(Lambda - np.diag(np.diagonal(Lambda))), 0)
+		# Check that Lambda is sorted in decreasing order
+		self.assertTrue(np.all(np.equal(np.diagonal(Lambda), sorted(np.diagonal(Lambda), reverse=True))))
+
+		# The eigenvectors should be the columns
+		self.assertEqual(np.shape(U), (784, 784))
+		self.assertTrue(np.all(np.isclose(S @ U, U @ Lambda)))
 
 class TestProjectImage(unittest.TestCase):
 	pass
