@@ -95,7 +95,15 @@ class TestGetEigPerc(unittest.TestCase):
 		self.assertTrue(np.all(np.isclose(S @ U, U @ Lambda)))
 
 class TestProjectImage(unittest.TestCase):
-	pass
+	def test_shape(self):
+		x = load_and_center_dataset('mnist.npy')
+		S = get_covariance(x)
+		_, U = get_eig(S, 2)
+		projected = project_image(x[3], U) # This is the image of the "9" in the spec
+
+		self.assertEqual(np.shape(projected), (784, 1))
+		self.assertAlmostEqual(np.min(projected), -113.79455198736488)
+		self.assertAlmostEqual(np.max(projected), 120.0658469887994)
 
 if __name__ == '__main__':
 	unittest.main()
