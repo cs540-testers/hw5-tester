@@ -1,7 +1,7 @@
 __author__ = 'cs540-testers'
 __credits__ = ['Harrison Clark', 'Stephen Jasina', 'Saurabh Kulkarni',
 		'Alex Moon']
-version = 'v1.0'
+version = 'v0.1'
 
 import unittest
 import numpy as np
