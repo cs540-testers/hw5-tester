@@ -1,16 +1,19 @@
 __author__ = 'cs540-testers'
 __credits__ = ['Harrison Clark', 'Stephen Jasina', 'Saurabh Kulkarni',
 		'Alex Moon']
-version = 'v0.1'
+version = 'v0.2'
 
+import sys
 import unittest
 import numpy as np
 from pca import load_and_center_dataset, get_covariance, get_eig, \
 		get_eig_perc, project_image, display_image
 
+mnist_path = 'mnist.py'
+
 class TestLoadAndCenterDataset(unittest.TestCase):
 	def test_load(self):
-		x = load_and_center_dataset('mnist.npy')
+		x = load_and_center_dataset(mnist_path)
 
 		# The dataset needs to have the correct shape
 		self.assertEqual(np.shape(x), (2000, 784))
@@ -19,7 +22,7 @@ class TestLoadAndCenterDataset(unittest.TestCase):
 		self.assertNotAlmostEqual(np.max(x) - np.min(x), 0)
 
 	def test_center(self):
-		x = load_and_center_dataset('mnist.npy')
+		x = load_and_center_dataset(mnist_path)
 
 		# Each coordinate of our dataset should average to 0
 		for i in range(np.shape(x)[1]):
@@ -27,14 +30,14 @@ class TestLoadAndCenterDataset(unittest.TestCase):
 
 class TestGetCovariance(unittest.TestCase):
 	def test_shape(self):
-		x = load_and_center_dataset('mnist.npy')
+		x = load_and_center_dataset(mnist_path)
 		S = get_covariance(x)
 
 		# S should be square and have side length d
 		self.assertEqual(np.shape(S), (784, 784))
 
 	def test_values(self):
-		x = load_and_center_dataset('mnist.npy')
+		x = load_and_center_dataset(mnist_path)
 		S = get_covariance(x)
 
 		# S should be symmetric
@@ -45,7 +48,7 @@ class TestGetCovariance(unittest.TestCase):
 
 class TestGetEig(unittest.TestCase):
 	def test_small(self):
-		x = load_and_center_dataset('mnist.npy')
+		x = load_and_center_dataset(mnist_path)
 		S = get_covariance(x)
 		Lambda, U = get_eig(S, 2)
 
@@ -58,7 +61,7 @@ class TestGetEig(unittest.TestCase):
 		self.assertTrue(np.all(np.isclose(S @ U, U @ Lambda)))
 
 	def test_large(self):
-		x = load_and_center_dataset('mnist.npy')
+		x = load_and_center_dataset(mnist_path)
 		S = get_covariance(x)
 		Lambda, U = get_eig(S, 784)
 
@@ -76,7 +79,7 @@ class TestGetEig(unittest.TestCase):
 
 class TestGetEigPerc(unittest.TestCase):
 	def test_small(self):
-		x = load_and_center_dataset('mnist.npy')
+		x = load_and_center_dataset(mnist_path)
 		S = get_covariance(x)
 		Lambda, U = get_eig_perc(S, .07)
 
@@ -89,7 +92,7 @@ class TestGetEigPerc(unittest.TestCase):
 		self.assertTrue(np.all(np.isclose(S @ U, U @ Lambda)))
 
 	def test_large(self):
-		x = load_and_center_dataset('mnist.npy')
+		x = load_and_center_dataset(mnist_path)
 		S = get_covariance(x)
 		# This will select all eigenvalues/eigenvectors
 		Lambda, U = get_eig_perc(S, -1)
@@ -108,7 +111,7 @@ class TestGetEigPerc(unittest.TestCase):
 
 class TestProjectImage(unittest.TestCase):
 	def test_shape(self):
-		x = load_and_center_dataset('mnist.npy')
+		x = load_and_center_dataset(mnist_path)
 		S = get_covariance(x)
 		_, U = get_eig(S, 2)
 		# This is the image of the "9" in the spec
@@ -119,5 +122,17 @@ class TestProjectImage(unittest.TestCase):
 		self.assertAlmostEqual(np.max(projected), 120.0658469887994)
 
 if __name__ == '__main__':
+	# Hack to allow different locations of mnist.npy (done this way to allow
+	# unittest's flags to still be passed, if desired)
+	if '--mnist-path' in sys.argv:
+		path_index = sys.argv.index('--mnist-path') + 1
+		if path_index == len(sys.argv):
+			print('Error: must supply path after option --mnist-path')
+			sys.exit(1)
+		mnist_path = sys.argv[path_index]
+		del(sys.argv[path_index])
+		del(sys.argv[path_index - 1])
+
 	print('Homework 5 Tester Version', version)
-	unittest.main()
+
+	unittest.main(argv=sys.argv)
