@@ -1,7 +1,7 @@
 __author__ = 'cs540-testers'
 __credits__ = ['Harrison Clark', 'Stephen Jasina', 'Saurabh Kulkarni',
 		'Alex Moon']
-version = 'v0.2'
+version = 'v0.2.1'
 
 import sys
 import unittest
@@ -9,7 +9,7 @@ import numpy as np
 from pca import load_and_center_dataset, get_covariance, get_eig, \
 		get_eig_perc, project_image, display_image
 
-mnist_path = 'mnist.py'
+mnist_path = 'mnist.npy'
 
 class TestLoadAndCenterDataset(unittest.TestCase):
 	def test_load(self):
