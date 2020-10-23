@@ -61,7 +61,7 @@ class TestEig(unittest.TestCase):
 		self.assertTrue(np.all(np.isclose(S @ U, U @ Lambda)))
 
 class TestGetEig(TestEig):
-	def test_small(self):
+	def test_spec(self):
 		x = load_and_center_dataset(mnist_path)
 		S = get_covariance(x)
 		Lambda, U = get_eig(S, 2)
