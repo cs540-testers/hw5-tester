@@ -1,7 +1,7 @@
 __author__ = 'cs540-testers'
 __credits__ = ['Harrison Clark', 'Stephen Jasina', 'Saurabh Kulkarni',
 		'Alex Moon']
-version = 'v0.2.1'
+version = 'v0.2.2'
 
 import sys
 import unittest
@@ -117,7 +117,7 @@ class TestProjectImage(unittest.TestCase):
 		# This is the image of the "9" in the spec
 		projected = project_image(x[3], U)
 
-		self.assertEqual(np.shape(projected), (784, 1))
+		self.assertEqual(np.shape(projected), (784,))
 		self.assertAlmostEqual(np.min(projected), -113.79455198736488)
 		self.assertAlmostEqual(np.max(projected), 120.0658469887994)
 
