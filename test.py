@@ -1,7 +1,7 @@
 __author__ = 'cs540-testers'
 __credits__ = ['Harrison Clark', 'Stephen Jasina', 'Saurabh Kulkarni',
 		'Alex Moon']
-version = 'v0.2.2'
+version = 'v0.3.0'
 
 import sys
 import unittest
@@ -46,8 +46,22 @@ class TestGetCovariance(unittest.TestCase):
 		# S should have non-negative values on the diagonal
 		self.assertTrue(np.min(np.diagonal(S)) >= 0)
 
-class TestGetEig(unittest.TestCase):
-	def test_small(self):
+class TestEig(unittest.TestCase):
+	def check_eigen(self, S, Lambda, U, m):
+		self.assertEqual(np.shape(Lambda), (m, m))
+		# Check that Lambda is diagonal
+		self.assertEqual(np.count_nonzero(
+				Lambda - np.diag(np.diagonal(Lambda))), 0)
+		# Check that Lambda is sorted in decreasing order
+		self.assertTrue(np.all(np.equal(np.diagonal(Lambda),
+				sorted(np.diagonal(Lambda), reverse=True))))
+
+		# The eigenvectors should be the columns
+		self.assertEqual(np.shape(U), (784, m))
+		self.assertTrue(np.all(np.isclose(S @ U, U @ Lambda)))
+
+class TestGetEig(TestEig):
+	def test_spec(self):
 		x = load_and_center_dataset(mnist_path)
 		S = get_covariance(x)
 		Lambda, U = get_eig(S, 2)
@@ -60,25 +74,18 @@ class TestGetEig(unittest.TestCase):
 		self.assertEqual(np.shape(U), (784, 2))
 		self.assertTrue(np.all(np.isclose(S @ U, U @ Lambda)))
 
-	def test_large(self):
+	def test_larger(self):
 		x = load_and_center_dataset(mnist_path)
 		S = get_covariance(x)
+
+		Lambda, U = get_eig(S, 20)
+		self.check_eigen(S, Lambda, U, 20)
+
 		Lambda, U = get_eig(S, 784)
+		self.check_eigen(S, Lambda, U, 784)
 
-		self.assertEqual(np.shape(Lambda), (784, 784))
-		# Check that Lambda is diagonal
-		self.assertEqual(np.count_nonzero(
-				Lambda - np.diag(np.diagonal(Lambda))), 0)
-		# Check that Lambda is sorted in decreasing order
-		self.assertTrue(np.all(np.equal(np.diagonal(Lambda),
-				sorted(np.diagonal(Lambda), reverse=True))))
-
-		# The eigenvectors should be the columns
-		self.assertEqual(np.shape(U), (784, 784))
-		self.assertTrue(np.all(np.isclose(S @ U, U @ Lambda)))
-
-class TestGetEigPerc(unittest.TestCase):
-	def test_small(self):
+class TestGetEigPerc(TestEig):
+	def test_spec(self):
 		x = load_and_center_dataset(mnist_path)
 		S = get_covariance(x)
 		Lambda, U = get_eig_perc(S, .07)
@@ -91,26 +98,20 @@ class TestGetEigPerc(unittest.TestCase):
 		self.assertEqual(np.shape(U), (784, 2))
 		self.assertTrue(np.all(np.isclose(S @ U, U @ Lambda)))
 
-	def test_large(self):
+	def test_larger(self):
 		x = load_and_center_dataset(mnist_path)
 		S = get_covariance(x)
+
+		# A value of perc=0.011 should yield 20 eigenvectors
+		Lambda, U = get_eig_perc(S, 0.011)
+		self.check_eigen(S, Lambda, U, 20)
+
 		# This will select all eigenvalues/eigenvectors
 		Lambda, U = get_eig_perc(S, -1)
-
-		self.assertEqual(np.shape(Lambda), (784, 784))
-		# Check that Lambda is diagonal
-		self.assertEqual(np.count_nonzero(
-				Lambda - np.diag(np.diagonal(Lambda))), 0)
-		# Check that Lambda is sorted in decreasing order
-		self.assertTrue(np.all(np.equal(np.diagonal(Lambda),
-				sorted(np.diagonal(Lambda), reverse=True))))
-
-		# The eigenvectors should be the columns
-		self.assertEqual(np.shape(U), (784, 784))
-		self.assertTrue(np.all(np.isclose(S @ U, U @ Lambda)))
+		self.check_eigen(S, Lambda, U, 784)
 
 class TestProjectImage(unittest.TestCase):
-	def test_shape(self):
+	def test_spec(self):
 		x = load_and_center_dataset(mnist_path)
 		S = get_covariance(x)
 		_, U = get_eig(S, 2)
